@@ -1,11 +1,5 @@
-from PyPDF2 import PdfReader 
-from PyPDF2 import PdfWriter
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import inch
-reader = PdfReader('m.pdf')
-for page in range(len(reader.pages)):
-    text= reader.pages[page].extract_text()
-c=canvas.Canvas('try.pdf', pagesize=A4, )
-c.drawCentredString(inch,inch, text)
-c.save()
+from PIL import Image, ImageDraw, ImageFont
+
+draw = ImageDraw.Draw()
+font = ImageFont.truetype("arial.ttf", 20)
+draw.text((20,20), "Hello World", font=font, fill=(0, 0, 0))

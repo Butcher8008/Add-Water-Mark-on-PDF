@@ -12,28 +12,53 @@ def makeWatermark(position, user_choice, x_coordinates, y_coordinates, fill_page
     fontSize = int(input("Enter the font size of the watermark: "))
     rotation_degree = int(input("Enter the rotation angle of the watermark: "))
     
-    pdf = canvas.Canvas("watermark.pdf", pagesize=A2)
+    pdf = canvas.Canvas("watermark.pdf", pagesize=A4)
     pdf.translate(dx=inch, dy=inch)
     
     if user_choice == 1:
         if position == "topleft":
             x = inch
             y = A2[1] - 200
+            pdf.setFillColor(colors.grey, alpha=0.6)
+            pdf.setFont(psfontname=fontType, size=fontSize)
+            pdf.rotate(rotation_degree)
+            pdf.drawCentredString(x, y, text)
+            pdf.save()
         elif position == "topright":
             x = A2[0] - 200
             y = A2[1] - 200 
+            pdf.setFillColor(colors.grey, alpha=0.6)
+            pdf.setFont(psfontname=fontType, size=fontSize)
+            pdf.rotate(rotation_degree)
+            pdf.drawCentredString(x, y, text)
+            pdf.save()
         elif position == "bottomleft":
             x = inch
             y = inch
+            pdf.setFillColor(colors.grey, alpha=0.6)
+            pdf.setFont(psfontname=fontType, size=fontSize)
+            pdf.rotate(rotation_degree)
+            pdf.drawCentredString(x, y, text)
+            pdf.save()
         elif position == "bottomright":
-            x = A2[0] - 200
+            x = A2[0] - 400
             y = inch
+            pdf.setFillColor(colors.grey, alpha=0.6)
+            pdf.setFont(psfontname=fontType, size=fontSize)
+            pdf.rotate(rotation_degree)
+            pdf.drawCentredString(x, y, text)
+            pdf.save()
         else:
             print("Invalid position. Please enter 'topleft', 'topright', 'bottomleft', or 'bottomright'.")
             return
     elif user_choice == 2:
         x = x_coordinates
         y = y_coordinates
+        pdf.setFillColor(colors.grey, alpha=0.6)
+        pdf.setFont(psfontname=fontType, size=fontSize)
+        pdf.rotate(rotation_degree)
+        pdf.drawCentredString(x, y, text)
+        pdf.save()
     else:
         print("Invalid choice. Please enter 1 for default option or 2 for custom coordinates.")
         return
@@ -53,12 +78,6 @@ def makeWatermark(position, user_choice, x_coordinates, y_coordinates, fill_page
             y += text_height  # Move to the next row for the next watermark
         pdf.save()
         return
-    
-    pdf.setFillColor(colors.grey, alpha=0.6)
-    pdf.setFont(psfontname=fontType, size=fontSize)
-    pdf.rotate(rotation_degree)
-    pdf.drawCentredString(x, y, text)
-    pdf.save()
 
 def merge():
     pdf_file = input("Enter PDF Name: ")

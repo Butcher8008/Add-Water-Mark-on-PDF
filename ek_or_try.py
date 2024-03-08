@@ -1,31 +1,107 @@
-from reportlab.lib import utils
-from reportlab.lib.pagesizes import letter
+from PIL import Image, ImageDraw, ImageFont
+from reportlab.lib.pagesizes import LETTER
 from reportlab.pdfgen import canvas
-from PyPDF2 import PdfWriter, PdfReader
+from reportlab.lib import colors
+import os
+import PyPDF2 
 
-# Creating the canvas with text
-my_canvas = canvas.Canvas("canvas_image.pdf", pagesize=letter)
-my_canvas.saveState()
-my_canvas.rotate(270)
-my_canvas.drawCentredString(-10, 10, 'osama')
-my_canvas.restoreState()
-my_canvas.save()
+Choice=input("Enter your choice: ")
+position=input("Enter position: (tl, tp, bl, br, tc, bc, lc, rc): ")
+angle= int(input('Enter the angle : '))
 
-# Read the PDF to which watermark needs to be added
-reader = PdfReader('m.pdf')
-output_pdf = PdfWriter()
 
-for page in reader.pages:
-    # Read watermark PDF
-    water_mark = PdfReader('canvas_image.pdf')
-    water_mark_page = water_mark.pages[0]
-    print(water_mark_page)
-    water_mark_page.rotate = (90)
+image = Image.new("RGBA", (200, 80), (255, 255, 255))
+draw = ImageDraw.Draw(image)
+font = ImageFont.truetype("arial.ttf", 20)
 
-    # Merge watermark with the page from original PDF
-    water_mark_page.merge_page(page)
-    output_pdf.add_page(water_mark_page)  # Add merged page to the output PDF
+draw.text((20,20), "Hello World", font=font, fill=(0, 0, 0))
 
-# Write the output PDF
-with open('output_pdf.pdf', 'wb') as f:
-    output_pdf.write(f)
+rotated_image = image.rotate(angle, expand=True, fillcolor=(255, 255, 255, 0))
+image_path = "temp_image.png"
+rotated_image.save(image_path)
+pdf_path = "output.pdf"
+
+c = canvas.Canvas(pdf_path, pagesize=LETTER)
+if Choice == "all":        
+    c.setFillColor(colors.grey,alpha=0.4)
+    c.drawImage(image_path, 10,700,)
+    c.drawImage(image_path, 10,300,)
+    c.drawImage(image_path, 400,700)
+    c.drawImage(image_path, 200,700)
+    c.drawImage(image_path, 200,300)
+    c.drawImage(image_path, 400,300)
+    c.drawImage(image_path, 400, 10) 
+    c.drawImage(image_path, 200, 10) 
+    c.drawImage(image_path, 10, 10) 
+elif Choice == "by choice":
+    if position=='tl':
+        c.setFillColor(colors.grey,alpha=0.4)
+        c.drawImage(image_path, 10,700)
+    elif position=='tr':
+        c.setFillColor(colors.grey,alpha=0.4)
+        c.drawImage(image_path, 400,700)
+    elif position=='bl':
+        c.setFillColor(colors.grey,alpha=0.4)
+        c.drawImage(image_path, 10,10)
+    elif position=='br':
+        c.setFillColor(colors.grey,alpha=0.4)
+        c.drawImage(image_path, 400,10)
+    elif position=='tc':
+        c.setFillColor(colors.grey,alpha=0.4)
+        c.drawImage(image_path, 200,700)
+    elif position=='bc':
+        c.setFillColor(colors.grey,alpha=0.4)
+        c.drawImage(image_path, 200,10)
+    elif position=='lc':
+        c.setFillColor(colors.grey,alpha=0.4)
+        c.drawImage(image_path, 10,300)
+    elif position=='bc':
+        c.setFillColor(colors.grey,alpha=0.4)
+        c.drawImage(image_path, 400,300)
+elif Choice=='top':
+    c.setFillColor(colors.grey, alpha=0.4)
+    c.drawImage(image_path, 10,700)
+    c.drawImage(image_path, 10,300)
+    c.drawImage(image_path, 10,10)
+elif Choice=='center':
+    c.setFillColor(colors.grey, alpha=0.4)
+    c.drawImage(image_path, 200,700)    
+    c.drawImage(image_path, 200,300)    
+    c.drawImage(image_path, 200,10)
+elif Choice == 'bottom':
+    c.setFillColor(colors.grey , alpha=0.4)
+    c.drawImage(image_path, 400,10)    
+    c.drawImage(image_path, 400,300)    
+    c.drawImage(image_path, 400,700)   
+elif Choice=='mid':
+    c.setFillColor(colors.grey, alpha=0.6)
+    c.setFont(psfontname="Helvetica", size=70)
+    c.rotate(angle)
+    c.drawCentredString(600, 100, "Hello world")
+
+c.save()
+os.remove(image_path)
+
+print("PDF saved successfully.")
+
+pdf_file = input("Enter PDF Name: ")
+reader = PyPDF2.PdfReader(pdf_file)
+water_mark = PyPDF2.PdfReader('output.pdf')
+output = PyPDF2.PdfWriter()
+    
+for page in range(len(reader.pages)):
+        main_page = reader.pages[page]
+        watermark_page = water_mark.pages[page % len(water_mark.pages)]
+        
+        # Create a new page object
+        merged_page = PyPDF2.PageObject.create_blank_page(width=main_page.mediabox.width ,height=main_page.mediabox.height)
+        # Overlay the main page onto the new page
+        merged_page.merge_page(main_page)
+        
+        # Overlay the watermark page behind the main page
+        merged_page.merge_page(watermark_page)
+        
+        # Add the merged page to the output PDF
+        output.add_page(merged_page)
+with open('waterMarked_pdf.pdf', 'wb') as file:
+    output.write(file)
